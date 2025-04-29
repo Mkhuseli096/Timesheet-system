@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - Projectized Timesheet System</title>
+  <style>
+    body {
+      background: black;
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      color: black;
+    }
+    h1 {
+      color: red;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin-top: 10px;
+      cursor: pointer;
+      width: 100%;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: darkred;
+    }
+    .link {
+      margin-top: 10px;
+      display: block;
+      color: red;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a> |
+  <a href="login.html">Login</a> |
+  <a href="timesheet.html">Timesheet</a> |
+  <a href="admin.html">Admin</a>
+</nav>
+
+
+<div class="login-container">
+  <h1>Login</h1>
+  <input type="email" id="loginEmail" placeholder="Enter Email" required>
+  <input type="password" id="loginPassword" placeholder="Enter Password" required>
+  <button onclick="login()">Login</button>
+  
+  <a class="link" href="register.html">Don't have an account? Register</a>
+  <a class="link" onclick="forgotPassword()">Forgot Password?</a>
+</div>
+
+<script>
+function login() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+
+  const user = users.find(u => u.email === email && u.password === password);
+
+  if (user) {
+    // Save login info in localStorage
+    localStorage.setItem("loggedInUser", JSON.stringify(user));
+    localStorage.setItem("userType", user.userType);
+
+    if (user.userType === "admin") {
+      window.location.href = "admin.html"; // ✅ Admin page
+    } else {
+      window.location.href = "timesheet.html"; // ✅ Employee page
+    }
+  } else {
+    alert("Invalid email or password. Please try again.");
+  }
+}
+
+function forgotPassword() {
+  alert("Please contact admin@projectized.co.za for password reset.");
+}
+</script>
+
+</body>
+</html>

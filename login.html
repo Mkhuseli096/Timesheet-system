@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Projectized Management</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    .login-container {
+      background: white;
+      color: black;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px red;
+      width: 300px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: red;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: darkred;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a> |
+  <a href="login.html">Login</a> |
+  <a href="timesheet.html">Timesheet</a> |
+  <a href="admin.html">Admin</a>
+</nav>
+
+
+<div class="login-container">
+  <h1>Login</h1>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <input type="password" id="password" placeholder="Enter your password" required>
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<script src="login.js"></script>
+
+</body>
+</html>
