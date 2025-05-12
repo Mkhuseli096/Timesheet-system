@@ -1,0 +1,97 @@
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Timesheet</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: black;
+      color: white;
+      padding: 20px;
+    }
+
+    h1 {
+      color: red;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      color: black;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: red;
+      color: white;
+    }
+
+    button {
+      background-color: red;
+      color: white;
+      border: red;
+      padding: 10px 20px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: darkred;
+    }
+  </style>
+  <script>
+    const role = localStorage.getItem("role");
+    const loggedIn = localStorage.getItem("loggedIn");
+  
+    if (role !== "admin" || loggedIn !== "true") {
+      alert("You must be logged in as admin to access this page.");
+      window.location.href = "login.html";
+    }
+  </script>
+  
+</head>
+
+<body>
+
+  <h2>Submitted Timesheets</h2>
+  <label for="employeeFilter">Filter by Employee:</label>
+  <select id="employeeFilter">
+      <option value="all">All Employees</option>
+  </select>
+  
+  <table id="adminTimesheetTable">
+      <thead>
+          <tr>
+              <th>Email</th>
+              <th>Hours Worked</th>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Project</th>
+              <th>Description</th>
+              <th>Status</th>
+          </tr>
+      </thead>
+      <tbody></tbody>
+  </table>
+  
+
+  <button onclick="downloadPDF()">Download as PDF</button>
+
+  <!-- jsPDF library for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- jsPDF autoTable plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- JS logic for displaying timesheets -->
+  <script src="admin.js"></script>
+  
+</body>
