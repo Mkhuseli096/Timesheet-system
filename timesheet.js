@@ -1,10 +1,9 @@
-// Get the form elements and the table body
+// Get the form and table body
 const timesheetForm = document.getElementById('timesheetForm');
 const timesheetTableBody = document.querySelector('#timesheetTable tbody');
 
-// Function to add a new project (timesheet entry)
+// Add project button click handler
 document.getElementById('addProjectBtn').addEventListener('click', function () {
-  const employeeEmail = document.getElementById('employeeId').value.trim();
   const hoursWorked = document.getElementById('hoursWorked').value.trim();
   const dateWorked = document.getElementById('dateWorked').value.trim();
   const category = document.getElementById('category').value;
@@ -12,15 +11,13 @@ document.getElementById('addProjectBtn').addEventListener('click', function () {
   const description = document.getElementById('description').value.trim();
   const status = document.getElementById('status').value;
 
-  // Validate form input
-  if (!employeeEmail || !hoursWorked || !dateWorked || !project || !description) {
-    alert("Please fill out all fields.");
+  // Validate input
+  if (!hoursWorked || !dateWorked || !project || !description) {
+    alert("Please fill out all required fields.");
     return;
   }
 
-  // Create a new timesheet entry object
   const timesheetEntry = {
-    email: employeeEmail,
     hoursWorked,
     dateWorked,
     category,
@@ -29,25 +26,15 @@ document.getElementById('addProjectBtn').addEventListener('click', function () {
     status
   };
 
-  // Get existing timesheets from localStorage
-  let timesheets = JSON.parse(localStorage.getItem('timesheets')) || [];
-
-  // Add the new entry to the array
-  timesheets.push(timesheetEntry);
-
-  // Save the updated timesheets back to localStorage
-  localStorage.setItem('timesheets', JSON.stringify(timesheets));
-
-  // Add the new entry to the table
+  // Add the entry to the table for preview
   addTimesheetToTable(timesheetEntry);
   clearForm();
 });
 
-// Function to add a timesheet entry to the table
+// Add row to the table
 function addTimesheetToTable(entry) {
   const row = document.createElement('tr');
   row.innerHTML = `
-    <td>${entry.email}</td>
     <td>${entry.hoursWorked}</td>
     <td>${entry.dateWorked}</td>
     <td>${entry.category}</td>
@@ -58,15 +45,42 @@ function addTimesheetToTable(entry) {
   timesheetTableBody.appendChild(row);
 }
 
-// Function to clear the form fields
+// Clear form
 function clearForm() {
   timesheetForm.reset();
 }
 
-// Display all saved timesheets on page load
+// On page load, clear the table
 window.onload = function () {
-  const savedTimesheets = JSON.parse(localStorage.getItem('timesheets')) || [];
-  savedTimesheets.forEach(entry => {
-    addTimesheetToTable(entry);
-  });
+  timesheetTableBody.innerHTML = '';
 };
+
+// Submit all rows to localStorage with email
+document.getElementById('submitBtn').addEventListener('click', function () {
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const email = loggedInUser?.email || "unknown";
+
+  const rows = document.querySelectorAll("#timesheetTable tbody tr");
+  const savedTimesheets = JSON.parse(localStorage.getItem("timesheets")) || [];
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+
+    const timesheetEntry = {
+      email: email, // ✅ Include email here
+      hoursWorked: cells[0].innerText,
+      dateWorked: cells[1].innerText,
+      category: cells[2].innerText,
+      project: cells[3].innerText,
+      description: cells[4].innerText,
+      status: cells[5].innerText
+    };
+
+    savedTimesheets.push(timesheetEntry);
+  });
+
+  localStorage.setItem("timesheets", JSON.stringify(savedTimesheets));
+  alert("Timesheet(s) submitted successfully!");
+  timesheetTableBody.innerHTML = '';
+  clearForm();
+});
