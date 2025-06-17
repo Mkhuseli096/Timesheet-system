@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Projectized Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f4f4f4;
+    }
+    .login-container {
+      background: white;
+      padding: 20px 30px;
+      max-width: 400px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #e53935;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>LOGIN TO PROJECTIZED</h2>
+    <select id="userSelect" required>
+      <option value="">Select Your Email</option>
+    </select>
+
+    <input type="password" id="passwordInput" placeholder="Enter your password" required>
+
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <script>
+    // Updated user list
+    const defaultUsers = [
+      { email: "enquiries@projectized.co.za", password: "Admin2025!", role: "admin" }, // ✅ Admin
+      { email: "mandisa@projectized.co.za", password: "Mandisa2025!", role: "employee" }, // ✅ Mandisa = employee
+      { email: "sinethemba@projectized.co.za", password: "Sinethemba2025!", role: "employee" },
+      { email: "kwenzeka@projectized.co.za", password: "Kwenzeka2025!", role: "employee" },
+      { email: "amaka@projectized.co.za", password: "Amaka2025!", role: "employee" },
+      { email: "mkhuseli@projectized.co.za", password: "MkhuseliAdmin2025!", role: "employee" },
+      { email: "nokky@projectized.co.za", password: "Nokky2025!", role: "employee" },
+      { email: "nqobile@projectized.co.za", password: "Nqobile2025!", role: "employee" },
+      { email: "lynette@projectized.co.za", password: "Lynettezinhle2025!", role: "employee" }
+    ];
+
+    // Populate dropdown
+    const userSelect = document.getElementById("userSelect");
+    defaultUsers.forEach(user => {
+      const option = document.createElement("option");
+      option.value = user.email;
+      option.textContent = user.email;
+      userSelect.appendChild(option);
+    });
+
+    // Handle login
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const selectedEmail = userSelect.value;
+      const enteredPassword = document.getElementById("passwordInput").value;
+
+      if (!selectedEmail || !enteredPassword) {
+        alert("Please select an email and enter the password.");
+        return;
+      }
+
+      const user = defaultUsers.find(u => u.email === selectedEmail);
+
+      if (!user || user.password !== enteredPassword) {
+        alert("Invalid credentials. Please try again.");
+        return;
+      }
+
+      // Save user session to localStorage
+      localStorage.setItem("loggedInUser", JSON.stringify(user));
+
+      // Redirect based on role
+      if (user.role === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "timesheet.html";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Timesheet Management System</title>
+
+
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: red;
+        }
+  
+
+        
+        .logo {
+            display: block;
+            margin: 0 auto;
+            width: 150px;
+            height: auto;
+        }
+
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            background: #0f2027;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            margin: 50px auto;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff0000; /* Red */
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input, select, button {
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            background-color: #ff0000; /* Red */
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #d40000; /* Darker red */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            color: black;
+        }
+
+        td {
+            background-color: red;
+            color: black;
+        }
+    </style>
+        <script>
+  // Check if user is logged in and is an employee
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  
+  if (!loggedInUser || loggedInUser.role !== "employee") {
+    alert("You must be logged in as an employee to access the timesheet.");
+    window.location.href = "login.html"; // Redirect to login
+  }
+</script>
+</head>
+<body>
+
+    
+    <div style="text-align: center;">
+        <img src="logo-2.png" alt="Projectized Logo" width="150">
+      </div>
+
+    
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <h1>PROJECTIZED MANAGEMENT<br>TIMESHEET</br></h1>
+        <form id="timesheetForm">
+            
+         <label for="hoursWorked">Hours Worked:</label>
+            <input type="number" id="hoursWorked" placeholder="Enter Hours Worked" min="1" max="24" required>
+
+            <label for="dateWorked">Date Worked:</label>
+            <input type="date" id="dateWorked" required>
+
+            <label for="category">Select Category:</label>
+            <select id="category" name="category">
+                <option value="Project Execution">Project Execution</option>
+                <option value="Up Skilling">Up Skilling</option>
+                <option value="Tender - RFI">Tender - RFI</option>
+                <option value="Tender - RFP">Tender - RFP</option>
+                <option value="Tender - RFQ">Tender - RFQ</option>
+                <option value="SPU Projects">SPU Projects</option>
+                <option value="Business Engagement">Business Engagement</option>
+                <option value="Operations">Operations</option>
+                <option value="Projectized Management Media">Projectized Management Media</option>
+                <option value="Market Outreach">Market Outreach</option>
+                <option value="Training and Development">Training and Development</option>
+                <option value="Executive Management (Exco) support">Executive Management (Exco) support</option>
+                <option value="Human Resources Management">Human Resources Management</option>
+                <option value="Administration">Administration</option>
+                <option value="Marketing (Social Media Management)">Marketing (Social Media Management)</option>
+            </select>
+
+            <label for="project">Project:</label>
+            <input type="text" id="project" placeholder="Enter Project Name" required>
+
+            <label for="description">Description:</label>
+            <input type="text" id="description" placeholder="Enter Description" required>
+
+            <label for="status">Status of Task:</label>
+            <select id="status" name="status">
+                <option value="Started">Started</option>
+                <option value="Waiting for the Feedback">Waiting for the Feedback</option>
+                <option value="Completed">Completed</option>                  
+            </select>
+
+            <button type="button" id="addProjectBtn">ADD PROJECT</button>
+        </form>
+
+        <h2>All TIMESHEETS</h2>
+        <table id="timesheetTable">
+            <thead>
+                <tr>
+            <th>Hours Worked</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Project</th>
+            <th>Description</th>
+            <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button type="button" id="submitBtn">Submit</button>
+
+    </div>
+
+    <!-- particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <!-- particles.js config -->
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": { "value": "#ffffff" },
+                "shape": {
+                    "type": "circle",
+                    "stroke": { "width": 0, "color": "#000000" },
+                    "polygon": { "nb_sides": 5 }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false
+                },
+                "size": {
+                    "value": 3,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 6,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "repulse" },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "repulse": { "distance": 100, "duration": 0.4 },
+                    "push": { "particles_nb": 4 }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+    <!-- Firebase App (core SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<!-- Firebase Realtime Database -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<!-- Your Firebase config -->
+<script>
+ const firebaseConfig = {
+  apiKey: "AIzaSyBBVVx_Y4oatqZUIGourHAquc_wSGdIZII",
+  authDomain: "timesheet-4b79c.firebaseapp.com",
+  databaseURL: "https://timesheet-4b79c-default-rtdb.firebaseio.com",
+  projectId: "timesheet-4b79c",
+  storageBucket: "timesheet-4b79c.firebasestorage.app",
+  messagingSenderId: "429029249383",
+  appId: "1:429029249383:web:ec19eb0ec3e05bf1ed9fc2",
+  measurementId: "G-NYEY64T8RJ"
+};
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+
+    <script src="timesheet.js"></script>
+
+    
+
+    
+</body>
+</html>
