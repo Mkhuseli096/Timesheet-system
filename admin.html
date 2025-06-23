@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Projectized Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    .header {
+      background-color: #d40000;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #333;
+      padding: 10px;
+      display: flex;
+      gap: 15px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+    }
+
+    nav a:hover {
+      background-color: #d40000;
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: #d40000;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    .btn-download {
+      background-color: #d40000;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .btn-download:hover {
+      background-color: #a30000;
+    }
+  </style>
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+
+<!-- Your Firebase config -->
+<script type="module" src="firebaseConfig.js"></script>
+
+</head>
+<body>
+  <div class="header">
+    <h1>Projectized Management - Admin Panel</h1>
+  </div>
+
+  <nav>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#monthlyTimesheets">Monthly Timesheets</a>
+    <a href="#allTimesheets">All Timesheets</a>
+    <a href="#employees">Employees</a>
+    <a href="index.html" onclick="logout()">Logout</a>
+  </nav>
+
+  <div class="container">
+
+    <div id="dashboard" class="section">
+      <h2>Dashboard</h2>
+      <p>Total Employees: <span id="totalEmployees">0</span></p>
+      <p>Total Timesheets Submitted: <span id="totalTimesheets">0</span></p>
+    </div>
+
+    <div id="monthlyTimesheets" class="section">
+      <h2>Monthly Timesheets </h2>
+      <div id="monthlyTimesheetContainer"></div>
+    </div>
+
+    <div id="allTimesheets" class="section">
+      <h2>All Timesheets</h2>
+      <table id="allTimesheetTable">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Date</th>
+            <th>Hours</th>
+            <th>Category</th>
+            <th>Project</th>
+            <th>Description</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="adminTimesheetBody"></tbody>
+      </table>
+      <button class="btn-download" onclick="downloadAllAsExcel()">Download All as Excel</button>
+    </div>
+
+    <div id="employees" class="section">
+      <h2>Registered Employees</h2>
+      <table id="employeeTable">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Registered On</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    function logout() {
+      localStorage.clear();
+    }
+
+    function downloadAllAsExcel() {
+      const table = document.getElementById("allTimesheetTable");
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(table);
+      XLSX.utils.book_append_sheet(wb, ws, "All Timesheets");
+      XLSX.writeFile(wb, "All_Timesheets.xlsx");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const tbody = document.getElementById("adminTimesheetBody");
+      const timesheets = JSON.parse(localStorage.getItem("timesheets")) || [];
+
+      if (timesheets.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='7'>No timesheets submitted.</td></tr>";
+        return;
+      }
+
+      timesheets.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.email}</td>
+          <td>${entry.dateWorked}</td>
+          <td>${entry.hoursWorked}</td>
+          <td>${entry.category}</td>
+          <td>${entry.project}</td>
+          <td>${entry.description}</td>
+          <td>${entry.status}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+  </script>
+  <script type="module" src="admin.js"></script>
+
+  <!-- Firebase SDKs -->
+<script type="module">
+  // Import Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBVVx_Y4oatqZUIGourHAquc_wSGdIZII",
+    authDomain: "timesheet-4b79c.firebaseapp.com",
+    databaseURL: "https://timesheet-4b79c-default-rtdb.firebaseio.com",
+    projectId: "timesheet-4b79c",
+    storageBucket: "timesheet-4b79c.appspot.com",
+    messagingSenderId: "429029249383",
+    appId: "1:429029249383:web:ec19eb0ec3e05bf1ed9fc2",
+    measurementId: "G-NYEY64T8RJ"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  // Make app/database accessible globally (optional)
+  window.firebaseApp = app;
+  window.firebaseDatabase = database;
+</script>
+
+</body>
+</html>
