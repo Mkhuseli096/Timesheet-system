@@ -167,29 +167,6 @@
       XLSX.writeFile(wb, "All_Timesheets.xlsx");
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const tbody = document.getElementById("adminTimesheetBody");
-      const timesheets = JSON.parse(localStorage.getItem("timesheets")) || [];
-
-      if (timesheets.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='7'>No timesheets submitted.</td></tr>";
-        return;
-      }
-
-      timesheets.forEach(entry => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${entry.email}</td>
-          <td>${entry.dateWorked}</td>
-          <td>${entry.hoursWorked}</td>
-          <td>${entry.category}</td>
-          <td>${entry.project}</td>
-          <td>${entry.description}</td>
-          <td>${entry.status}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    });
   </script>
   <script type="module" src="admin.js"></script>
 
