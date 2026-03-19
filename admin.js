@@ -1,56 +1,80 @@
 import { db, ref, get, child } from "./firebaseConfig.js";
 
-// Load Employees
+// ===================== LOAD EMPLOYEES =====================
 const employeeTable = document.querySelector("#employeeTable tbody");
-const employeeRef = ref(db);
 
-get(child(employeeRef, "employees")).then((snapshot) => {
-  if (snapshot.exists()) {
-    const employees = snapshot.val();
-    document.getElementById("totalEmployees").textContent = Object.keys(employees).length;
-    employeeTable.innerHTML = "";
-    Object.values(employees).forEach(emp => {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td>${emp.email}</td><td>${emp.registeredOn}</td>`;
-      employeeTable.appendChild(row);
-    });
-  }
-});
+get(child(ref(db), "employees"))
+  .then((snapshot) => {
+    console.log("Employees:", snapshot.val());
 
-// Load Timesheets
+    if (snapshot.exists()) {
+      const employees = snapshot.val();
+      document.getElementById("totalEmployees").textContent = Object.keys(employees).length;
+
+      employeeTable.innerHTML = "";
+
+      Object.values(employees).forEach(emp => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${emp.email}</td><td>${emp.registeredOn}</td>`;
+        employeeTable.appendChild(row);
+      });
+    } else {
+      console.log("No employees found");
+    }
+  })
+  .catch((error) => {
+    console.error("Employee error:", error);
+  });
+
+
+// ===================== LOAD TIMESHEETS =====================
 const allTableBody = document.getElementById("adminTimesheetBody");
 const monthlyContainer = document.getElementById("monthlyTimesheetContainer");
-const timesheetRef = ref(db);
 
-get(child(timesheetRef, "timesheets")).then((snapshot) => {
-  if (snapshot.exists()) {
+get(child(ref(db), "timesheets"))
+  .then((snapshot) => {
+    console.log("Timesheets:", snapshot.val()); // 🔥 DEBUG
+
+    if (!snapshot.exists()) {
+      allTableBody.innerHTML = "<tr><td colspan='7'>No timesheets found in Firebase</td></tr>";
+      return;
+    }
+
     const timesheets = snapshot.val();
     const timesheetArray = Object.values(timesheets);
+
     document.getElementById("totalTimesheets").textContent = timesheetArray.length;
 
-    // Fill All Timesheets
+    // ===================== ALL TIMESHEETS =====================
     allTableBody.innerHTML = "";
+
     timesheetArray.forEach(entry => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${entry.email}</td>
-        <td>${entry.dateWorked}</td>
-        <td>${entry.hoursWorked}</td>
-        <td>${entry.category}</td>
-        <td>${entry.project}</td>
-        <td>${entry.description}</td>
-        <td>${entry.status}</td>
+        <td>${entry.email || ""}</td>
+        <td>${entry.dateWorked || ""}</td>
+        <td>${entry.hoursWorked || ""}</td>
+        <td>${entry.category || ""}</td>
+        <td>${entry.project || ""}</td>
+        <td>${entry.description || ""}</td>
+        <td>${entry.status || ""}</td>
       `;
       allTableBody.appendChild(row);
     });
 
-    // Group and Fill Monthly Timesheets
+    // ===================== MONTHLY GROUP =====================
     const grouped = {};
+
     timesheetArray.forEach(entry => {
       const date = new Date(entry.dateWorked);
+
+      if (isNaN(date)) return; // skip bad dates
+
       const monthYear = `${date.toLocaleString("default", { month: "long" })} ${date.getFullYear()}`;
+
       if (!grouped[entry.email]) grouped[entry.email] = {};
       if (!grouped[entry.email][monthYear]) grouped[entry.email][monthYear] = [];
+
       grouped[entry.email][monthYear].push(entry);
     });
 
@@ -69,12 +93,11 @@ get(child(timesheetRef, "timesheets")).then((snapshot) => {
         monthSection.style.marginBottom = "20px";
 
         const heading = document.createElement("h4");
-        heading.textContent = `${month}`;
+        heading.textContent = month;
         monthSection.appendChild(heading);
 
-        const tableId = `table-${email.replace(/[^a-zA-Z0-9]/g, '')}-${month.replace(/\s/g, '')}`;
         const table = document.createElement("table");
-        table.setAttribute("id", tableId);
+
         table.innerHTML = `
           <thead>
             <tr>
@@ -99,47 +122,14 @@ get(child(timesheetRef, "timesheets")).then((snapshot) => {
             `).join('')}
           </tbody>
         `;
+
         monthSection.appendChild(table);
-
-        // ✅ Updated Download Button with Proper Excel Formatting
-        const downloadBtn = document.createElement("button");
-        downloadBtn.textContent = `Download for ${email}`;
-        downloadBtn.classList.add("btn-download");
-
-        downloadBtn.addEventListener("click", () => {
-          const data = grouped[email][month].map(entry => {
-            const date = new Date(entry.dateWorked);
-            const formattedDate = !isNaN(date) ? date.toISOString().split("T")[0] : "";
-            return {
-              "Date": formattedDate,
-              "Hours": entry.hoursWorked,
-              "Category": entry.category,
-              "Project": entry.project,
-              "Description": entry.description,
-              "Status": entry.status
-            };
-          });
-
-          const ws = XLSX.utils.json_to_sheet(data);
-          ws["!cols"] = [
-            { wch: 15 },
-            { wch: 10 },
-            { wch: 20 },
-            { wch: 20 },
-            { wch: 30 },
-            { wch: 15 },
-          ];
-
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, `${month}`);
-          XLSX.writeFile(wb, `${email}-${month}-Timesheet.xlsx`);
-        });
-
-        monthSection.appendChild(downloadBtn);
         userSection.appendChild(monthSection);
       }
 
       monthlyContainer.appendChild(userSection);
     }
-  }
-});
+  })
+  .catch((error) => {
+    console.error("Timesheet error:", error); // 🔥 VERY IMPORTANT
+  });
